@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6258d9">
+<meta name="description" content="Save, practise and remember useful English vocabulary every day.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+
+<title>WordBloom — Vocabulary Builder</title>
+<style>
+:root{--bg:#f5f7ff;--card:#fff;--ink:#202746;--muted:#6c7390;--primary:#6258d9;--soft:#ecebff;--line:#e7e9f4;--green:#18845b;--orange:#b66a19;--shadow:0 12px 35px #30376b12}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,Arial,sans-serif}
+header{background:linear-gradient(120deg,#6258d9,#8b7cf0);color:white;padding:25px max(20px,calc((100% - 1100px)/2));}
+header h1{margin:0;font-size:26px}header p{margin:4px 0 0;color:#eeedff}
+main{max-width:1100px;margin:24px auto;padding:0 18px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px;box-shadow:var(--shadow)}.stat strong{display:block;font-size:25px}.stat span,.muted{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;overflow:auto;margin:18px 0}.tab,button{border:0;border-radius:11px;padding:10px 15px;background:var(--soft);color:var(--primary);font-weight:650;cursor:pointer}.tab.active,button.primary{background:var(--primary);color:white}.tab:hover,button:hover{filter:brightness(.97)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel h2{font-size:18px;margin:0 0 13px}.field{margin:10px 0}.field label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit;color:var(--ink);background:#fff}.field textarea{min-height:70px;resize:vertical}.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.word{border:1px solid var(--line);border-radius:13px;padding:13px;margin:10px 0}.word h3{margin:0 0 3px}.pill{font-size:11px;padding:3px 8px;border-radius:99px;background:#f0efff;color:var(--primary)}.empty{text-align:center;padding:25px;color:var(--muted)}.hidden{display:none!important}.reviewbox{text-align:center;padding:22px 12px}.reviewword{font-size:30px;font-weight:800;margin:12px 0}.answer{background:#f8f8ff;border-radius:12px;padding:15px;text-align:left;margin:14px auto;max-width:600px}.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.small{font-size:12px}.danger{background:#fff0f0;color:#b43a3a}.success{color:var(--green);font-weight:700}.notice{padding:11px 13px;border-radius:11px;background:#f0f8f4;color:#236b4d;margin:10px 0;font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.stats{gap:8px}.stat{padding:12px}.stat strong{font-size:21px}}
+</style>
+</head>
+<body>
+<header><h1>🌱 WordBloom</h1><p>Save a word. Understand it. Use it. Remember it.</p></header>
+<main>
+ <section class="stats">
+  <div class="stat"><strong id="total">0</strong><span>Words collected</span></div>
+  <div class="stat"><strong id="due">0</strong><span>Ready to revise</span></div>
+  <div class="stat"><strong id="mastered">0</strong><span>Remembered words</span></div>
+ </section>
+ <nav class="tabs">
+  <button class="tab active" data-tab="add">＋ Add a word</button>
+  <button class="tab" data-tab="review">↻ Daily revision</button>
+  <button class="tab" data-tab="library">▤ My word bank</button>
+ </nav>
+ <section id="add" class="grid">
+  <div class="panel">
+   <h2>Add a new word</h2>
+   <form id="wordForm">
+    <div class="field"><label for="word">Word *</label><input id="word" required placeholder="e.g. Resilient"></div>
+    <div class="field"><label for="meaning">Meaning in simple English *</label><textarea id="meaning" required placeholder="Able to recover after a difficult situation"></textarea></div>
+    <div class="field"><label for="example">Example sentence</label><textarea id="example" placeholder="She stayed resilient during a difficult year."></textarea></div>
+    <div class="field"><label for="mySentence">My own sentence (helps you remember)</label><textarea id="mySentence" placeholder="Write one sentence about your own daily life."></textarea></div>
+    <div class="field"><label for="memory">Memory clue (optional)</label><input id="memory" placeholder="A short association, synonym or translation"></div>
+    <button class="primary" type="submit">Save word</button>
+   </form>
+   <div id="savedMsg" class="notice hidden">Word saved! It will appear in your revision queue.</div>
+  </div>
+  <div class="panel">
+   <h2>How WordBloom helps you remember</h2>
+   <p>Each word moves through a simple spaced-revision cycle:</p>
+   <div class="word"><b>1. Learn</b><div class="muted">Read the meaning and example. Write your own sentence.</div></div>
+   <div class="word"><b>2. Recall</b><div class="muted">Try to remember the meaning before revealing it.</div></div>
+   <div class="word"><b>3. Apply</b><div class="muted">Say or write a fresh sentence using the word today.</div></div>
+   <div class="word"><b>4. Repeat</b><div class="muted">Revision intervals grow as you remember: 1, 3, 7, 14 and 30 days.</div></div>
+   <p class="muted">Your words stay saved in this browser on this device. Export a backup from My word bank.</p>
+  </div>
+ </section>
+ <section id="review" class="panel hidden">
+  <h2>Daily revision</h2><p class="muted" id="reviewInfo">Words due for review will appear here.</p>
+  <div id="reviewArea" class="reviewbox"></div>
+ </section>
+ <section id="library" class="panel hidden">
+  <div class="row"><div><h2>My word bank</h2><p class="muted">Search, practise or back up your vocabulary.</p></div><div class="row"><input id="search" placeholder="Search words..." style="min-width:130px;padding:10px;border:1px solid var(--line);border-radius:10px"><button id="exportBtn">Export backup</button><button id="importBtn">Import</button><input id="fileInput" type="file" accept="application/json" class="hidden"></div></div>
+  <div id="wordList"></div>
+ </section>
+</main>
+<footer>WordBloom · Small daily practice builds lasting vocabulary.</footer>
+<script>
+const KEY='wordbloom_words_v1';
+let words=JSON.parse(localStorage.getItem(KEY)||'[]'), current=null, revealed=false;
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(words));renderStats();};
+const dueWords=()=>words.filter(w=>!w.nextReview||w.nextReview<=today());
+function showTab(name){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));['add','review','library'].forEach(id=>$(id).classList.toggle('hidden',id!==name));if(name==='review')renderReview();if(name==='library')renderLibrary();}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function renderStats(){$('total').textContent=words.length;$('due').textContent=dueWords().length;$('mastered').textContent=words.filter(w=>w.level>=4).length;}
+$('wordForm').addEventListener('submit',e=>{e.preventDefault();const w=$('word').value.trim();if(words.some(x=>x.word.toLowerCase()===w.toLowerCase())){alert('That word is already in your word bank.');return;}words.unshift({id:Date.now(),word:w,meaning:$('meaning').value.trim(),example:$('example').value.trim(),mySentence:$('mySentence').value.trim(),memory:$('memory').value.trim(),level:0,nextReview:today(),created:today()});save();e.target.reset();$('savedMsg').classList.remove('hidden');setTimeout(()=>$('savedMsg').classList.add('hidden'),2500);});
+function renderReview(){const due=dueWords();$('reviewInfo').textContent=`${due.length} word${due.length===1?'':'s'} ready today · ${words.length-due.length} scheduled for later`;if(!due.length){$('reviewArea').innerHTML='<div class="empty">🎉 You are all caught up! Add a new word or come back when your next review is due.</div>';current=null;return;}if(!current||!due.some(w=>w.id===current.id)){current=due[0];revealed=false;}const w=current;$('reviewArea').innerHTML=`<div class="muted">Word ${due.findIndex(x=>x.id===w.id)+1} of ${due.length} due today</div><div class="reviewword">${escapeHtml(w.word)}</div><div class="muted">Try to recall the meaning before revealing it.</div><button class="primary" id="revealBtn">${revealed?'Hide answer':'Reveal meaning'}</button><div id="answerBox" class="${revealed?'answer':'hidden'}">${revealed?`<b>Meaning:</b> ${escapeHtml(w.meaning)}${w.example?`<p><b>Example:</b> ${escapeHtml(w.example)}</p>`:''}${w.memory?`<p><b>Memory clue:</b> ${escapeHtml(w.memory)}</p>`:''}<p><b>Your sentence:</b> ${escapeHtml(w.mySentence||'Add your own sentence in the word bank.')}</p><div class="field"><label for="todaySentence">Apply it today — write a new sentence</label><textarea id="todaySentence" placeholder="Use “${escapeHtml(w.word)}” in a sentence..."></textarea></div>`:''}</div><div id="rateActions" class="actions ${revealed?'':'hidden'}"><button class="danger" id="againBtn">✕ Not yet</button><button class="primary" id="knownBtn">✓ I remembered</button></div>`;
+$('revealBtn').onclick=()=>{revealed=!revealed;renderReview();};
+if(revealed){$('againBtn').onclick=()=>rate(false);$('knownBtn').onclick=()=>rate(true);}
+}
+function rate(known){const w=current;if(!w)return;const sentence=$('todaySentence')?.value.trim();if(sentence)w.lastPractice=sentence;if(known){w.level=Math.min(5,(w.level||0)+1);const days=[1,3,7,14,30];w.nextReview=new Date(Date.now()+days[Math.max(0,w.level-1)]*86400000).toISOString().slice(0,10);}else{w.level=0;w.nextReview=today();}save();current=null;revealed=false;renderReview();}
+function renderLibrary(){const q=$('search').value.toLowerCase();const list=words.filter(w=>(w.word+' '+w.meaning).toLowerCase().includes(q));$('wordList').innerHTML=list.length?list.map(w=>`<article class="word"><div class="row"><div><h3>${escapeHtml(w.word)} <span class="pill">Level ${w.level||0}/5</span></h3><div>${escapeHtml(w.meaning)}</div></div><button data-edit="${w.id}">Edit</button><button class="danger" data-delete="${w.id}">Delete</button></div>${w.example?`<p class="muted"><b>Example:</b> ${escapeHtml(w.example)}</p>`:''}${w.mySentence?`<p class="muted"><b>Your sentence:</b> ${escapeHtml(w.mySentence)}</p>`:''}<p class="small muted">Next review: ${w.nextReview||'Today'}</p></article>`).join(''):'<div class="empty">No words found. Add your first word to get started.</div>';
+document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{if(confirm('Delete this word?')){words=words.filter(w=>w.id!=b.dataset.delete);save();renderLibrary();}});
+document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editWord(Number(b.dataset.edit)));
+}
+function editWord(id){const w=words.find(x=>x.id===id);if(!w)return;const meaning=prompt('Meaning:',w.meaning);if(meaning===null)return;const example=prompt('Example sentence:',w.example||'');if(example===null)return;const own=prompt('Your own sentence:',w.mySentence||'');if(own===null)return;w.meaning=meaning.trim();w.example=example.trim();w.mySentence=own.trim();save();renderLibrary();}
+$('search').addEventListener('input',renderLibrary);
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(words,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wordbloom-backup.json';a.click();URL.revokeObjectURL(a.href);};
+$('importBtn').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const incoming=JSON.parse(await f.text());if(!Array.isArray(incoming))throw Error();const ids=new Set(words.map(w=>w.word.toLowerCase()));incoming.forEach(w=>{if(w.word&&!ids.has(w.word.toLowerCase()))words.push({...w,id:Date.now()+Math.random()});});save();renderLibrary();alert('Backup imported.');}catch{alert('That backup file could not be read.');}};
+function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+renderStats();
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('Offline setup unavailable:', err));
+  });
+}
+</script>
+</body>
+</html>
